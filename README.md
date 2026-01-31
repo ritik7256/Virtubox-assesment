@@ -1,49 +1,45 @@
-# Task Management App
 
-A simple full-stack task management application where users can register, log in, and manage tasks .
+##Task Managment app Assesment By virtubox
 
-user can create, update, complete, and delete tasks
+## Frontend
 
----
+The Frontend of this Project is Done By React Js 
+i used latest version of viite for React setup
 
-User authentication (Register / Login / Logout)
-Protected routes using authentication check
-Create, read, update, and delete tasks
-Mark tasks as completed
-Clean  UI
-Secure API with cookies-based authentication
+for Styling i used Tailwind CSS which is fast and compact to write
 
 
-## Tech Stack
 
-### Frontend
-- React
-- React Router
-- Axios
-- Tailwind CSS
+## Backend
+The backend is done by node js ,express js and Mongo Db for database
 
-### Backend
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT (stored in HTTP-only cookies)
 
----
+## Instruction to run the project 
 
-## 📂 Project Structure
+go to frontend directory by cd .. frontend , then type command npm run dev in vs code
 
-```bash
-client/
- ├── pages/
- │   ├── Login.jsx
- │   ├── Register.jsx
- │   └── Task.jsx
- ├── ProtectedRoute.jsx
- └── App.jsx
+Go to backend directory by cd .. backend ,then type commmand npm run dev in vs code the server will start
 
-server/
- ├── routes/
- ├── controllers/
- ├── models/
- └── middleware/
+before running ensure node modules to be installed for this type npm install ,, to download all the packages to start the project
+
+
+
+## Folder Strucure
+
+i designed backend from authentication to task route from scratch
+then by neat and clean mvc folder structure i created each files for working 
+
+the API is created for authentication and task managing
+
+
+## Functionality
+User can register and login 
+and can read ,update ,create, delete the task 
+
+This Project has  CRUD functionality
+Create 
+Read 
+Update
+Delete
+
+the task 
