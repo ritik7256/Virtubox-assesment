@@ -40,4 +40,11 @@ const login=async(req,res)=>{
     })
     res.json({messge:"Login Successfull"})
 }
-export {register,login};
+const checkAuth = (req, res) => {
+  if (!req.cookies.token) {
+    return res.status(401).json({ loggedIn: false });
+  }
+  res.json({ loggedIn: true });
+};
+
+export {register,login,checkAuth};

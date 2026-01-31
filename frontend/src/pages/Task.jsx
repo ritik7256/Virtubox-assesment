@@ -1,10 +1,12 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const Task = () => {
   const [tasks, setTasks] = useState([]);
   const [title, setTitle] = useState("");
   const [editId, setEditId] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     getTasks();
@@ -19,24 +21,20 @@ const Task = () => {
 
   const submitTask = async (e) => {
     e.preventDefault();
-
-    if (!title) {
-      alert("Enter task");
-      return;
-    }
+    if (!title) return alert("Enter task");
 
     if (editId) {
       await axios.put(
         `http://localhost:5000/api/task/${editId}`,
         { title },
-        { withCredentials: true },
+        { withCredentials: true }
       );
       setEditId("");
     } else {
       await axios.post(
         "http://localhost:5000/api/task",
         { title },
-        { withCredentials: true },
+        { withCredentials: true }
       );
     }
 
@@ -55,73 +53,96 @@ const Task = () => {
     await axios.put(
       `http://localhost:5000/api/task/${item._id}`,
       { completed: !item.completed },
-      { withCredentials: true },
+      { withCredentials: true }
     );
     getTasks();
   };
 
+  const logoutUser = async () => {
+    await axios.post(
+      "http://localhost:5000/api/auth/logout",
+      {},
+      { withCredentials: true }
+    );
+    navigate("/login");
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-200 to-slate-400">
-      <div className="w-full max-w-md bg-slate-900 rounded-xl shadow-xl p-6 text-white">
-        <h2 className="text-2xl font-semibold mb-5 text-center">Task App</h2>
+    <div className="min-h-screen flex bg-gradient-to-br from-slate-200 to-slate-400">
 
-      
-        <form onSubmit={submitTask} className="flex gap-2 mb-6">
-          <input
-            className="flex-1 rounded-lg px-3 py-2 
-             bg-slate-800 
-             border border-slate-600
-             text-white 
-             placeholder-gray-400
-             outline-none 
-             focus:border-indigo-500 
-             focus:ring-1 focus:ring-indigo-500"
-            placeholder="Add a task..."
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+     
+      <div className="w-48 bg-slate-900 text-white flex flex-col justify-between p-4">
+        <h2 className="text-xl font-semibold text-center">Tasks</h2>
 
-          <button className="bg-indigo-600 hover:bg-indigo-500 transition px-4 rounded-lg font-medium">
-            {editId ? "Update" : "Add"}
-          </button>
-        </form>
+        <button
+          onClick={logoutUser}
+          className="bg-red-600 hover:bg-red-500 transition py-2 rounded-lg font-medium"
+        >
+          Logout
+        </button>
+      </div>
 
-       
-        <div className="space-y-3">
-          {tasks.map((item) => (
-            <div
-              key={item._id}
-              className="flex justify-between items-center bg-slate-700 px-3 py-2 rounded-lg"
-            >
-              <span
-                onClick={() => toggleTask(item)}
-                className={`cursor-pointer ${
-                  item.completed ? "line-through text-gray-400" : "text-white"
-                }`}
+     
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-full max-w-md bg-slate-900 rounded-xl shadow-xl p-6 text-white">
+          <h2 className="text-2xl font-semibold mb-5 text-center">
+            Task App
+          </h2>
+
+          <form onSubmit={submitTask} className="flex gap-2 mb-6">
+            <input
+              className="flex-1 rounded-lg px-3 py-2 bg-slate-800 border border-slate-600
+                         text-white placeholder-gray-400 outline-none
+                         focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+              placeholder="Add a task..."
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+
+            <button className="bg-indigo-600 hover:bg-indigo-500 transition px-4 rounded-lg font-medium">
+              {editId ? "Update" : "Add"}
+            </button>
+          </form>
+
+          <div className="space-y-3">
+            {tasks.map((item) => (
+              <div
+                key={item._id}
+                className="flex justify-between items-center bg-slate-700 px-3 py-2 rounded-lg"
               >
-                {item.title}
-              </span>
-
-              <div className="flex gap-3 text-sm">
-                <button
-                  onClick={() => {
-                    setTitle(item.title);
-                    setEditId(item._id);
-                  }}
-                  className="text-yellow-400 hover:text-yellow-300"
+                <span
+                  onClick={() => toggleTask(item)}
+                  className={`cursor-pointer ${
+                    item.completed
+                      ? "line-through text-gray-400"
+                      : "text-white"
+                  }`}
                 >
-                  Edit
-                </button>
+                  {item.title}
+                </span>
 
-                <button
-                  onClick={() => removeTask(item._id)}
-                  className="text-red-400 hover:text-red-300"
-                >
-                  Delete
-                </button>
+                <div className="flex gap-3 text-sm">
+                  <button
+                    onClick={() => {
+                      setTitle(item.title);
+                      setEditId(item._id);
+                    }}
+                    className="text-yellow-400 hover:text-yellow-300"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    onClick={() => removeTask(item._id)}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
         </div>
       </div>
     </div>
