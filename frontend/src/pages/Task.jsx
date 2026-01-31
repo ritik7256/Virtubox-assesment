@@ -1,76 +1,131 @@
-// axios instance with withCredentials
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import  axios from "axios"
-function Task() {
-  const [task, setTask] = useState([]);
-  const [input, setInput] = useState("");
+import axios from "axios";
+import { useEffect, useState } from "react";
 
-  const fetchAllTasks = async () => {
-    const res = await axios.get(
-      "https://todo-deploy-p5bm.onrender.com/api/todos"
-    );
-    setTodos(res.data);
-  };
+const Task = () => {
+  const [tasks, setTasks] = useState([]);
+  const [title, setTitle] = useState("");
+  const [editId, setEditId] = useState("");
 
   useEffect(() => {
-    fetchAllTasks();
+    getTasks();
   }, []);
 
-  const addTask = async () => {
-    if (!input) return;
-    const res = await axios.post(
-      "https://todo-deploy-p5bm.onrender.com/api/todos",
-      {
-        title: input,
-      }
-    );
-    setTask([...task, res.data]);
-    setInput("");
+  const getTasks = async () => {
+    const res = await axios.get("http://localhost:5000/api/task", {
+      withCredentials: true,
+    });
+    setTasks(res.data);
   };
 
-  const toggleComplete = async (id) => {
-    const res = await axios.put(
-      `https://todo-deploy-p5bm.onrender.com/todos/${id}`
-    );
-    setTask(task.map((task) => (task._id === id ? res.data : task)));
+  const submitTask = async (e) => {
+    e.preventDefault();
+
+    if (!title) {
+      alert("Enter task");
+      return;
+    }
+
+    if (editId) {
+      await axios.put(
+        `http://localhost:5000/api/task/${editId}`,
+        { title },
+        { withCredentials: true },
+      );
+      setEditId("");
+    } else {
+      await axios.post(
+        "http://localhost:5000/api/task",
+        { title },
+        { withCredentials: true },
+      );
+    }
+
+    setTitle("");
+    getTasks();
   };
 
-  const deleteTask = async (id) => {
-    await axios.delete(`https://todo-deploy-p5bm.onrender.com/api/todos/${id}`);
-    setTask(todos.filter((task) => task._id !== id));
+  const removeTask = async (id) => {
+    await axios.delete(`http://localhost:5000/api/task/${id}`, {
+      withCredentials: true,
+    });
+    getTasks();
+  };
+
+  const toggleTask = async (item) => {
+    await axios.put(
+      `http://localhost:5000/api/task/${item._id}`,
+      { completed: !item.completed },
+      { withCredentials: true },
+    );
+    getTasks();
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
-      <h1 className="text-2xl font-bold text-center mb-4">Todo App</h1>
-      <div className="flex justify-center gap-2 mb-4">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="border rounded px-3 py-1"
-          placeholder="Add a new todo"
-        />
-        <button
-          onClick={addTask}
-          className="bg-blue-500 text-white px-4 py-1 rounded"
-        >
-          Add
-        </button>
-      </div>
-      <div className="max-w-md mx-auto space-y-2">
-        {todos.map((todo) => (
-          <TodoItem
-            key={todo._id}
-            todo={todo}
-            onToggle={toggleComplete}
-            onDelete={deleteTodo}
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-200 to-slate-400">
+      <div className="w-full max-w-md bg-slate-900 rounded-xl shadow-xl p-6 text-white">
+        <h2 className="text-2xl font-semibold mb-5 text-center">Task App</h2>
+
+      
+        <form onSubmit={submitTask} className="flex gap-2 mb-6">
+          <input
+            className="flex-1 rounded-lg px-3 py-2 
+             bg-slate-800 
+             border border-slate-600
+             text-white 
+             placeholder-gray-400
+             outline-none 
+             focus:border-indigo-500 
+             focus:ring-1 focus:ring-indigo-500"
+            placeholder="Add a task..."
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
-        ))}
+
+          <button className="bg-indigo-600 hover:bg-indigo-500 transition px-4 rounded-lg font-medium">
+            {editId ? "Update" : "Add"}
+          </button>
+        </form>
+
+       
+        <div className="space-y-3">
+          {tasks.map((item) => (
+            <div
+              key={item._id}
+              className="flex justify-between items-center bg-slate-700 px-3 py-2 rounded-lg"
+            >
+              <span
+                onClick={() => toggleTask(item)}
+                className={`cursor-pointer ${
+                  item.completed ? "line-through text-gray-400" : "text-white"
+                }`}
+              >
+                {item.title}
+              </span>
+
+              <div className="flex gap-3 text-sm">
+                <button
+                  onClick={() => {
+                    setTitle(item.title);
+                    setEditId(item._id);
+                  }}
+                  className="text-yellow-400 hover:text-yellow-300"
+                >
+                  Edit
+                </button>
+
+                <button
+                  onClick={() => removeTask(item._id)}
+                  className="text-red-400 hover:text-red-300"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
-}
+};
 
 export default Task;
